@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 import org.littletonrobotics.junction.AutoLog;
 
@@ -49,12 +50,12 @@ public interface AngularMotorIO {
     /**
      * Updates the telemetry
      */
-    public void updateTelemetry();
+    public default void updateTelemetry() {};
 
     /**
      * Updates the simulation
      */
-    public void updateSimulation();
+    public default void updateSimulation() {};
 
     /**
      * Gets a SysID command
@@ -64,5 +65,7 @@ public interface AngularMotorIO {
      * @param duration   maximum duration of the sysID routine
      * @return command sequence to run sysID on the mechanism
      */
-    public Command getSysIDCmd(Voltage maxVoltage, Velocity<VoltageUnit> step, Time duration);
+    public default Command getSysIDCmd(Voltage maxVoltage, Velocity<VoltageUnit> step, Time duration) {
+        return Commands.none();
+    };
 }
