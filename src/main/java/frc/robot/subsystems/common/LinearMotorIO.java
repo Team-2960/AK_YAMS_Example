@@ -19,6 +19,34 @@ public interface LinearMotorIO {
     }
 
     /**
+     * Updates the set of loggable inputs
+     *
+     * @param inputs motor inputs object
+     */
+    public default void updateInputs(LinearMotorInputs inputs) {}
+
+    /**
+     * Run the motor at a specified open loop value
+     *
+     * @param output Output voltage to set
+     */
+    public default void set(Voltage output) {}
+
+    /**
+     * Run the motor at the specified velocity.
+     *
+     * @param velocityRadPerSec target velocity
+     */
+    public default void set(LinearVelocity velocityRadPerSec) {}
+
+    /**
+     * Run the turn motor to the specified rotation.
+     *
+     * @param rotation Target position
+     */
+    public default void set(Distance rotation) {}
+
+    /**
      * Updates the telemetry
      */
     public void updateTelemetry();
@@ -27,34 +55,6 @@ public interface LinearMotorIO {
      * Updates the simulation
      */
     public void updateSimulation();
-
-    /**
-     * Updates the set of loggable inputs
-     *
-     * @param inputs motor inputs object
-     */
-    public void updateInputs(LinearMotorInputs inputs);
-
-    /**
-     * Run the motor at a specified open loop value
-     *
-     * @param output Output voltage to set
-     */
-    public void set(Voltage output);
-
-    /**
-     * Run the motor at the specified velocity.
-     *
-     * @param velocityRadPerSec target velocity
-     */
-    public void set(LinearVelocity velocityRadPerSec);
-
-    /**
-     * Run the turn motor to the specified rotation.
-     *
-     * @param rotation Target position
-     */
-    public void set(Distance rotation);
 
     /**
      * Gets a SysID command
