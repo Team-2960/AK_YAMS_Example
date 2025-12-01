@@ -1,9 +1,8 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.common;
 
 import edu.wpi.first.units.*;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.common.LinearMotorIO;
 import yams.mechanisms.positional.Elevator;
 import yams.motorcontrollers.SmartMotorController;
 
