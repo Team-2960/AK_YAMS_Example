@@ -10,24 +10,21 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class AngularMechanism extends SubsystemBase {
-    private final AngularMotorIO io;
+public abstract class AngularMechanism extends SubsystemBase {
     private final AngularMotorInputsAutoLogged inputs = new AngularMotorInputsAutoLogged();
 
     /**
-     * Constructor
-     * 
-     * @param io mechanism IO object
+     * Get the IO object for the mechanism
+     * @return  the IO object for the mechanism
      */
-    public AngularMechanism(AngularMotorIO io) {
-        this.io = io;
-    }
+    public abstract AngularMotorIO getIO();
 
     /**
      * Update telemetry and inputs
      */
     @Override
     public void periodic() {
+        var io = getIO();
         io.updateTelemetry();
         io.updateInputs(inputs);
     }
@@ -37,7 +34,7 @@ public class AngularMechanism extends SubsystemBase {
      */
     @Override
     public void simulationPeriodic() {
-        io.updateSimulation();
+        getIO().updateSimulation();
     }
 
     /*****************************/
@@ -51,7 +48,7 @@ public class AngularMechanism extends SubsystemBase {
      * @return command to move to a position
      */
     public Command setPosCmd(Angle pos) {
-        return this.run(() -> io.set(pos));
+        return this.run(() -> getIO().set(pos));
     }
 
     /**
@@ -61,7 +58,7 @@ public class AngularMechanism extends SubsystemBase {
      * @return command to control the motor with a given voltage supplier
      */
     public Command setVoltCmd(Supplier<Voltage> volts) {
-        return this.run(() -> io.set(volts.get()));
+        return this.run(() -> getIO().set(volts.get()));
     }
 
     /**
@@ -71,7 +68,7 @@ public class AngularMechanism extends SubsystemBase {
      * @return command to control the motor with a given voltage
      */
     public Command setVoltCmd(Voltage volts) {
-        return this.run(() -> io.set(volts));
+        return this.run(() -> getIO().set(volts));
     }
 
     /**
@@ -83,6 +80,6 @@ public class AngularMechanism extends SubsystemBase {
      * @return command sequence to run sysID on the mechanism
      */
     public Command getSysIDCmd(Voltage maxVoltage, Velocity<VoltageUnit> step, Time duration) {
-        return io.getSysIDCmd(maxVoltage, step, duration);
+        return getIO().getSysIDCmd(maxVoltage, step, duration);
     }
 }
