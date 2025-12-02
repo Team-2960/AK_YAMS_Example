@@ -68,5 +68,8 @@
   },
   "[java]": {
     "editor.defaultFormatter": "redhat.java"
-  }
+},
+"cSpell.words": [
+    "Feedforward"
+]
 }
