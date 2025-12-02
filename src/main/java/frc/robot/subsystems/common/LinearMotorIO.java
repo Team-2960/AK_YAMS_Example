@@ -2,6 +2,8 @@ package frc.robot.subsystems.common;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.HashMap;
+
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -9,7 +11,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface LinearMotorIO {
+public class LinearMotorIO {
+
+    private final HashMap<String, Distance> presetPos = new HashMap<>();
+    private final HashMap<String, LinearVelocity> presetVel = new HashMap<>();
+
     @AutoLog
     public static class LinearMotorInputs {
         public boolean connected = false;
@@ -20,42 +26,102 @@ public interface LinearMotorIO {
     }
 
     /**
+     * Adds a new preset position. If the name already exists, the existing preset
+     * will be
+     * overwritten
+     * 
+     * @param name preset name
+     * @param pos  preset position
+     */
+    public final void addPreset(String name, Distance pos) {
+        presetPos.put(name, pos);
+    }
+
+    /**
+     * Adds a new preset velocity. If the name already exists, the existing preset
+     * will be
+     * overwritten
+     * 
+     * @param name preset name
+     * @param vel  preset velocity
+     */
+    public final void addPreset(String name, LinearVelocity vel) {
+        presetVel.put(name, vel);
+    }
+
+    /**
      * Updates the set of loggable inputs
      *
      * @param inputs motor inputs object
      */
-    public default void updateInputs(LinearMotorInputs inputs) {}
+    public void updateInputs(LinearMotorInputs inputs) {
+    }
 
     /**
      * Run the motor at a specified open loop value
      *
      * @param output Output voltage to set
      */
-    public default void set(Voltage output) {}
+    public void set(Voltage output) {
+    }
 
     /**
      * Run the motor at the specified velocity.
      *
      * @param velocityRadPerSec target velocity
      */
-    public default void set(LinearVelocity velocityRadPerSec) {}
+    public void set(LinearVelocity output) {
+    }
 
     /**
      * Run the turn motor to the specified rotation.
      *
      * @param rotation Target position
      */
-    public default void set(Distance rotation) {}
+    public void set(Distance output) {
+    }
+
+    /**
+     * Moves to a named preset position
+     * 
+     * @param name name the preset
+     * @throws RuntimeException Thrown if name does not exist in the preset position
+     *                          list
+     */
+    public void gotoPresetPos(String name) {
+        if (presetPos.containsKey(name)) {
+            set(presetPos.get(name));
+        } else {
+            throw new RuntimeException("No preset position with name " + name + "exists.");
+        }
+    }
+
+    /**
+     * Moves to a named preset position
+     * 
+     * @param name name the preset
+     * @throws RuntimeException Thrown if name does not exist in the preset position
+     *                          list
+     */
+    public void gotoPresetVel(String name) {
+        if (presetVel.containsKey(name)) {
+            set(presetVel.get(name));
+        } else {
+            throw new RuntimeException("No preset velocity with name " + name + "exists.");
+        }
+    }
 
     /**
      * Updates the telemetry
      */
-    public default void updateTelemetry() {};
+    public void updateTelemetry() {
+    };
 
     /**
      * Updates the simulation
      */
-    public default void updateSimulation() {};
+    public void updateSimulation() {
+    };
 
     /**
      * Gets a SysID command
@@ -65,7 +131,7 @@ public interface LinearMotorIO {
      * @param duration   maximum duration of the sysID routine
      * @return command sequence to run sysID on the mechanism
      */
-    public default Command getSysIDCmd(Voltage maxVoltage, Velocity<VoltageUnit> step, Time duration) {
+    public Command getSysIDCmd(Voltage maxVoltage, Velocity<VoltageUnit> step, Time duration) {
         return Commands.none();
     };
 }

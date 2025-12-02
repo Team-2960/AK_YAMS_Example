@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import yams.mechanisms.positional.Elevator;
 import yams.motorcontrollers.SmartMotorController;
 
-public class ElevatorMechanismIO implements LinearMotorIO {
+public class ElevatorMechanismIO extends LinearMotorIO {
     /** Elevator instance */
     private final Elevator elevator;
     private final SmartMotorController motor;

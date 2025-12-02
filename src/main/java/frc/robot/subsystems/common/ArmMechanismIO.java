@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import yams.mechanisms.positional.Arm;
 import yams.motorcontrollers.SmartMotorController;
 
-public class ArmMechanismIO implements AngularMotorIO {
+public class ArmMechanismIO extends AngularMotorIO {
     /** Arm instance */
     private final Arm arm;
     private final SmartMotorController motor;

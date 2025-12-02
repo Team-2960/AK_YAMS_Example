@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -48,7 +50,7 @@ public class CoralArm extends AngularMechanism {
             Constants.coralArmMotorID,
             MotorType.kBrushless);
 
-    /** Smart Motor COntroller Initialization */
+    /** Smart Motor Controller Initialization */
     private final SmartMotorController motor = new SparkWrapper(
             sparkFlex, DCMotor.getNeoVortex(1), motorConfig);
 
@@ -63,7 +65,7 @@ public class CoralArm extends AngularMechanism {
             .withStartingPosition(Constants.coralArmStartPos)
             .withLength(Constants.coralArmLength)
             .withMass(Constants.coralArmMass)
-            .withTelemetry(getName(), null);
+            .withTelemetry(getName(), TelemetryVerbosity.HIGH);
 
     /** Arm Mechanism Initialization */
     private final Arm arm = new Arm(armConfig);
@@ -78,8 +80,17 @@ public class CoralArm extends AngularMechanism {
         if(Constants.currentMode != Mode.REPLAY) {
             io = new ArmMechanismIO(arm);
         } else {
-            io = new AngularMotorIO() {};
+            io = new AngularMotorIO();
         }
+        
+        // Add preset positions
+        io.addPreset("Travel", Degrees.of(75.0));
+        io.addPreset("Intake", Degrees.of(85.5));
+        io.addPreset("L1", Degrees.of(73));
+        io.addPreset("L2", Degrees.of(60));
+        io.addPreset("L3", Degrees.of(60));
+        io.addPreset("L4", Degrees.of(60));
+        io.addPreset("Algae", Degrees.of(45));
     }
 
     @Override

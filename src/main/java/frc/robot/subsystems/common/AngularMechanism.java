@@ -3,10 +3,7 @@ package frc.robot.subsystems.common;
 import java.util.function.Supplier;
 
 import edu.wpi.first.units.VoltageUnit;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.units.measure.Velocity;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -15,7 +12,8 @@ public abstract class AngularMechanism extends SubsystemBase {
 
     /**
      * Get the IO object for the mechanism
-     * @return  the IO object for the mechanism
+     * 
+     * @return the IO object for the mechanism
      */
     public abstract AngularMotorIO getIO();
 
@@ -52,6 +50,26 @@ public abstract class AngularMechanism extends SubsystemBase {
     }
 
     /**
+     * Gets a command to run the mechanism at a velocity from a supplier
+     * 
+     * @param vel velocity supplier
+     * @return command to run the mechanism at a velocity from a supplier
+     */
+    public Command setVelCmd(Supplier<AngularVelocity> vel) {
+        return this.run(() -> getIO().set(vel.get()));
+    }
+
+    /**
+     * Gets a command to run the mechanism at a velocity
+     * 
+     * @param vel velocity supplier
+     * @return command to run the mechanism at a velocity
+     */
+    public Command setVelCmd(AngularVelocity vel) {
+        return this.run(() -> getIO().set(vel));
+    }
+
+    /**
      * Gets a command to control the motor with a given voltage supplier
      * 
      * @param volts voltage supplier
@@ -69,6 +87,26 @@ public abstract class AngularMechanism extends SubsystemBase {
      */
     public Command setVoltCmd(Voltage volts) {
         return this.run(() -> getIO().set(volts));
+    }
+
+    /**
+     * Gets a command to move to a preset position
+     * 
+     * @param name name of a preset position
+     * @return command to move to a preset position
+     */
+    public Command presetPosCmd(String name) {
+        return this.run(() -> getIO().gotoPresetPos(name));
+    }
+
+    /**
+     * Gets a command to move to a preset velocity
+     * 
+     * @param name name of a preset velocity
+     * @return command to move to a preset velocity
+     */
+    public Command presetVelCmd(String name) {
+        return this.run(() -> getIO().gotoPresetVel(name));
     }
 
     /**
