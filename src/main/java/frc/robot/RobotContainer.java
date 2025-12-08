@@ -13,21 +13,12 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.DriveCommands;
-import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CoralArm;
-import frc.robot.subsystems.drive.ctreswerve.*;
+import frc.robot.subsystems.TankDrive;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -42,79 +33,19 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
     // Subsystems
-    private final CTRESwerve drive;
-    private final CoralArm coralArm;
+    private final TankDrive drive = new TankDrive();
 
     // driveCtrl
     private final CommandXboxController driveCtrl = new CommandXboxController(0);
     private final CommandXboxController opCtrl = new CommandXboxController(1);
 
     // Dashboard inputs
-    private final LoggedDashboardChooser<Command> autoChooser;
+    private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Test");
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-        switch (Constants.currentMode) {
-            case REAL:
-                // Real robot, instantiate hardware IO implementations
-                drive = new CTRESwerve(
-                        new GyroIOPigeon2(),
-                        new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                        new ModuleIOTalonFX(TunerConstants.FrontRight),
-                        new ModuleIOTalonFX(TunerConstants.BackLeft),
-                        new ModuleIOTalonFX(TunerConstants.BackRight));
-                break;
-
-            case SIM:
-                // Sim robot, instantiate physics sim IO implementations
-                drive = new CTRESwerve(
-                        new GyroIO() {
-                        },
-                        new ModuleIOSim(TunerConstants.FrontLeft),
-                        new ModuleIOSim(TunerConstants.FrontRight),
-                        new ModuleIOSim(TunerConstants.BackLeft),
-                        new ModuleIOSim(TunerConstants.BackRight));
-                break;
-
-            default:
-                // Replayed robot, disable IO implementations
-                drive = new CTRESwerve(
-                        new GyroIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        });
-                break;
-        }
-
-        coralArm = new CoralArm();
-
-        // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-        // Set up SysId routines
-        autoChooser.addOption(
-                "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-        autoChooser.addOption(
-                "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Forward)",
-                drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Reverse)",
-                drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        autoChooser.addOption(
-                "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
         // Configure the button bindings
         configureButtonBindings();
     }
@@ -130,36 +61,9 @@ public class RobotContainer {
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(
-                DriveCommands.joystickDrive(
-                        drive,
-                        () -> -driveCtrl.getLeftY(),
-                        () -> -driveCtrl.getLeftX(),
-                        () -> -driveCtrl.getRightX()));
-
-        // Lock to 0° when A button is held
-        driveCtrl
-                .a()
-                .whileTrue(
-                        DriveCommands.joystickDriveAtAngle(
-                                drive,
-                                () -> -driveCtrl.getLeftY(),
-                                () -> -driveCtrl.getLeftX(),
-                                () -> new Rotation2d()));
-
-        // Switch to X pattern when X button is pressed
-        driveCtrl.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
-        // Reset gyro to 0° when B button is pressed
-        driveCtrl
-                .b()
-                .onTrue(
-                        Commands.runOnce(
-                                () -> drive.setPose(
-                                        new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                                drive)
-                                .ignoringDisable(true));
-
-        opCtrl.a().onTrue(coralArm.setPosCmd(Degrees.of(90)));
+            drive.joystickDriveCmd(
+                () -> MathUtil.applyDeadband(-driveCtrl.getLeftY(), .05),
+                () -> MathUtil.applyDeadband(-driveCtrl.getRightY(), .05)));
     }
 
     /**

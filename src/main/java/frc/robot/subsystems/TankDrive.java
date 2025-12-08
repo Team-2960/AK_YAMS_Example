@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.function.DoubleSupplier;
-
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -11,13 +9,11 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.*;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.subsystems.common.LinearMechanism;
-import frc.robot.subsystems.common.LinearMotorIO;
-import frc.robot.subsystems.common.RollerMechanismIO;
+import frc.robot.subsystems.common.DifferentialDrive;
+import frc.robot.subsystems.common.DifferentialDriveIO;
+import frc.robot.subsystems.common.DifferentialDriveIOYAMS;
 import frc.robot.util.PIDConfig;
 import yams.gearing.MechanismGearing;
 import yams.motorcontrollers.SmartMotorController;
@@ -27,7 +23,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
 
-public class TankDrive {
+public class TankDrive extends DifferentialDrive {
 
     // Constants
     private final MechanismGearing gearRatio = new MechanismGearing(8.45 / 1);
@@ -46,116 +42,72 @@ public class TankDrive {
     private final PIDConfig pid = new PIDConfig(.002, 0, 0);
     private final SimpleMotorFeedforward ff = new SimpleMotorFeedforward(.02, .025, .029481);
 
-    /**
-     * Defines a single side of the drivetrain
-     */
-    private class LeftSide extends LinearMechanism {
-        /** Motor Controller Initialization */
-        private final SparkFlex frontMotor = new SparkFlex(Constants.occraLFDriveID, MotorType.kBrushless);
-        private final SparkFlex rearMotor = new SparkFlex(Constants.occraLRDriveID, MotorType.kBrushless);
+    /** Motor Controller Initialization */
+    private final SparkFlex lfMotor = new SparkFlex(Constants.occraLFDriveID, MotorType.kBrushless);
+    private final SparkFlex lrMotor = new SparkFlex(Constants.occraLRDriveID, MotorType.kBrushless);
+    private final SparkFlex rfMotor = new SparkFlex(Constants.occraLFDriveID, MotorType.kBrushless);
+    private final SparkFlex rrMotor = new SparkFlex(Constants.occraLRDriveID, MotorType.kBrushless);
 
-        /** Left Motor Configuration */
-        private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
-                .withGearing(gearRatio)
-                .withExternalEncoderGearing(gearRatio)
-                .withWheelDiameter(wheelDiam)
-                .withMomentOfInertia(wheelDiam, mass)
-                .withControlMode(ControlMode.CLOSED_LOOP)
-                .withClosedLoopController(pid.kP, pid.kI, pid.kD, maxVel, maxAccel)
-                .withSimClosedLoopController(pid.kP, pid.kI, pid.kD, maxVel, maxAccel)
-                .withFeedforward(ff)
-                .withSimFeedforward(ff)
-                .withTelemetry("Left Motor", TelemetryVerbosity.HIGH)
-                .withIdleMode(MotorMode.BRAKE)
-                .withStatorCurrentLimit(maxCurrent)
-                .withClosedLoopRampRate(closedLoopRampRate)
-                .withOpenLoopRampRate(openLoopRampRate)
-                .withFollowers(Pair.of(rearMotor, false));
+    /** Left Motor Configuration */
+    private final SmartMotorControllerConfig leftMotorConfig = new SmartMotorControllerConfig(this)
+            .withGearing(gearRatio)
+            .withExternalEncoderGearing(gearRatio)
+            .withWheelDiameter(wheelDiam)
+            .withMomentOfInertia(wheelDiam, mass)
+            .withControlMode(ControlMode.CLOSED_LOOP)
+            .withClosedLoopController(pid.kP, pid.kI, pid.kD, maxVel, maxAccel)
+            .withSimClosedLoopController(pid.kP, pid.kI, pid.kD, maxVel, maxAccel)
+            .withFeedforward(ff)
+            .withSimFeedforward(ff)
+            .withTelemetry("Left Motor", TelemetryVerbosity.HIGH)
+            .withIdleMode(MotorMode.BRAKE)
+            .withStatorCurrentLimit(maxCurrent)
+            .withClosedLoopRampRate(closedLoopRampRate)
+            .withOpenLoopRampRate(openLoopRampRate)
+            .withFollowers(Pair.of(lrMotor, false));
 
-        /** Smart Motor Controller Initialization */
-        private final SmartMotorController motor = new SparkWrapper(
-                frontMotor,
-                DCMotor.getNeoVortex(1),
-                motorConfig);
+    /** Left Motor Configuration */
+    private final SmartMotorControllerConfig rightMotorConfig = new SmartMotorControllerConfig(this)
+            .withGearing(gearRatio)
+            .withExternalEncoderGearing(gearRatio)
+            .withWheelDiameter(wheelDiam)
+            .withMomentOfInertia(wheelDiam, mass)
+            .withControlMode(ControlMode.CLOSED_LOOP)
+            .withClosedLoopController(pid.kP, pid.kI, pid.kD, maxVel, maxAccel)
+            .withSimClosedLoopController(pid.kP, pid.kI, pid.kD, maxVel, maxAccel)
+            .withFeedforward(ff)
+            .withSimFeedforward(ff)
+            .withTelemetry("Left Motor", TelemetryVerbosity.HIGH)
+            .withIdleMode(MotorMode.BRAKE)
+            .withStatorCurrentLimit(maxCurrent)
+            .withClosedLoopRampRate(closedLoopRampRate)
+            .withOpenLoopRampRate(openLoopRampRate)
+            .withFollowers(Pair.of(rrMotor, false));
 
-        /** Roller mechanism IO */
-        private final LinearMotorIO io;
+    /** Smart Motor Controller Initialization */
+    private final SmartMotorController leftMotor = new SparkWrapper(
+            lfMotor,
+            DCMotor.getNeoVortex(1),
+            leftMotorConfig);
 
-        public LeftSide() {
-            if (Constants.currentMode != Mode.REPLAY) {
-                io = new RollerMechanismIO(motor);
-            } else {
-                io = new LinearMotorIO();
-            }
-        }
+    private final SmartMotorController rightMotor = new SparkWrapper(
+            rfMotor,
+            DCMotor.getNeoVortex(1),
+            rightMotorConfig);
 
-        @Override
-        public LinearMotorIO getIO() {
-            return io;
-        }
-    }
+    /** Roller mechanism IO */
+    private final DifferentialDriveIO io;
 
-        /**
-     * Defines a single side of the drivetrain
-     */
-    private class RightSide extends LinearMechanism {
-        /** Motor Controller Initialization */
-        private final SparkFlex frontMotor = new SparkFlex(Constants.occraLFDriveID, MotorType.kBrushless);
-        private final SparkFlex rearMotor = new SparkFlex(Constants.occraLRDriveID, MotorType.kBrushless);
-
-        /** Left Motor Configuration */
-        private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
-                .withGearing(gearRatio)
-                .withExternalEncoderGearing(gearRatio)
-                .withWheelDiameter(wheelDiam)
-                .withMomentOfInertia(wheelDiam, mass)
-                .withControlMode(ControlMode.CLOSED_LOOP)
-                .withClosedLoopController(pid.kP, pid.kI, pid.kD, maxVel, maxAccel)
-                .withSimClosedLoopController(pid.kP, pid.kI, pid.kD, maxVel, maxAccel)
-                .withFeedforward(ff)
-                .withSimFeedforward(ff)
-                .withTelemetry("Left Motor", TelemetryVerbosity.HIGH)
-                .withIdleMode(MotorMode.BRAKE)
-                .withStatorCurrentLimit(maxCurrent)
-                .withClosedLoopRampRate(closedLoopRampRate)
-                .withOpenLoopRampRate(openLoopRampRate)
-                .withFollowers(Pair.of(rearMotor, false));
-
-        /** Smart Motor Controller Initialization */
-        private final SmartMotorController motor = new SparkWrapper(
-                frontMotor,
-                DCMotor.getNeoVortex(1),
-                motorConfig);
-
-        /** Roller mechanism IO */
-        private final LinearMotorIO io;
-
-        public RightSide() {
-            if (Constants.currentMode != Mode.REPLAY) {
-                io = new RollerMechanismIO(motor);
-            } else {
-                io = new LinearMotorIO();
-            }
-        }
-
-        @Override
-        public LinearMotorIO getIO() {
-            return io;
+    public TankDrive() {
+        if (Constants.currentMode != Mode.REPLAY) {
+            io = new DifferentialDriveIOYAMS(leftMotor, rightMotor, maxDriveVoltage, maxVel);
+        } else {
+            io = new DifferentialDriveIO();
         }
     }
 
-
-    private final LeftSide leftSide = new LeftSide();
-    private final RightSide rightSide = new RightSide();
-
-
-
-    /*****************************/
-    /* Command Factories Methods */
-    /*****************************/
-    public Command joystickDriveCmd(DoubleSupplier left, DoubleSupplier right) {
-        return Commands.parallel(
-            leftSide.setVoltCmd(() -> maxDriveVoltage.times(left.getAsDouble())),
-            rightSide.setVoltCmd(() -> maxDriveVoltage.times(right.getAsDouble())));
+    @Override
+    public DifferentialDriveIO getIO() {
+        return io;
     }
 }
