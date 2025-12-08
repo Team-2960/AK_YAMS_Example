@@ -36,8 +36,8 @@ public class CoralRoller extends LinearMechanism {
     private final Time closedLoopRampRate = Seconds.of(.25);
     private final Time openLoopRampRate = Seconds.of(.25);
 
-    private final AngularVelocity maxVel = DegreesPerSecond.of(90);
-    private final AngularAcceleration maxAccel = DegreesPerSecondPerSecond.of(810);
+    private final LinearVelocity maxVel = InchesPerSecond.of(12);
+    private final LinearAcceleration maxAccel = InchesPerSecond.per(Seconds).of(144);
 
     private final PIDConfig pid = new PIDConfig(.002, 0, 0);
     private final SimpleMotorFeedforward ff = new SimpleMotorFeedforward(.02, .025, .029481);

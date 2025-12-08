@@ -64,5 +64,10 @@ public final class Constants {
 
     public static final int climberMotorID = 14;
 
+    public static final int occraLFDriveID = 1;
+    public static final int occraLRDriveID = 2;
+    public static final int occraRFDriveID = 4;
+    public static final int occraRRDriveID = 3;
+    // IO IDs
     public static final int coralIntakePEID = 0;
 }
