@@ -11,7 +11,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package frc.robot.subsystems.drive;
+package frc.robot.subsystems.drive.ctreswerve;
 
 import static frc.robot.util.PhoenixUtil.*;
 
@@ -166,7 +166,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 
         // Configure periodic frames
         BaseStatusSignal.setUpdateFrequencyForAll(
-                Drive.ODOMETRY_FREQUENCY, drivePosition, turnPosition);
+                CTRESwerve.ODOMETRY_FREQUENCY, drivePosition, turnPosition);
         BaseStatusSignal.setUpdateFrequencyForAll(
                 50.0,
                 driveVelocity,
