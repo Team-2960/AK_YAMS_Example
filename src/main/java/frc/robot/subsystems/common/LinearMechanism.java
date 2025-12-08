@@ -6,91 +6,91 @@ import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
 
 public abstract class LinearMechanism extends MotorMechanism {
-  private final LinearMotorInputsAutoLogged inputs = new LinearMotorInputsAutoLogged();
+    private final LinearMotorInputsAutoLogged inputs = new LinearMotorInputsAutoLogged();
 
-  /**
-   * Gets MotorIO instance
-   *
-   * @return motorIO instance
-   */
-  protected MotorIO getMotorIO() {
-    return getIO();
-  }
+    /**
+     * Gets MotorIO instance
+     *
+     * @return motorIO instance
+     */
+    protected MotorIO getMotorIO() {
+        return getIO();
+    }
 
-  /**
-   * Get the IO object for the mechanism
-   *
-   * @return the IO object for the mechanism
-   */
-  public abstract LinearMotorIO getIO();
+    /**
+     * Get the IO object for the mechanism
+     *
+     * @return the IO object for the mechanism
+     */
+    public abstract LinearMotorIO getIO();
 
-  /** Update telemetry and inputs */
-  @Override
-  public void periodic() {
-    var io = getIO();
-    io.updateTelemetry();
-    io.updateInputs(inputs);
-  }
+    /** Update telemetry and inputs */
+    @Override
+    public void periodic() {
+        var io = getIO();
+        io.updateTelemetry();
+        io.updateInputs(inputs);
+    }
 
-  /** Update the simulation */
-  @Override
-  public void simulationPeriodic() {
-    getIO().updateSimulation();
-  }
+    /** Update the simulation */
+    @Override
+    public void simulationPeriodic() {
+        getIO().updateSimulation();
+    }
 
-  /*****************************/
-  /* Command Factories Methods */
-  /*****************************/
+    /*****************************/
+    /* Command Factories Methods */
+    /*****************************/
 
-  /**
-   * Gets a command to move to a position
-   *
-   * @param pos position to move to
-   * @return command to move to a position
-   */
-  public Command setPosCmd(Distance pos) {
-    return this.run(() -> getIO().set(pos));
-  }
+    /**
+     * Gets a command to move to a position
+     *
+     * @param pos position to move to
+     * @return command to move to a position
+     */
+    public Command setPosCmd(Distance pos) {
+        return this.run(() -> getIO().set(pos));
+    }
 
-  /**
-   * Gets a command to run the mechanism at a velocity from a supplier
-   *
-   * @param vel velocity supplier
-   * @return command to run the mechanism at a velocity from a supplier
-   */
-  public Command setVelCmd(Supplier<LinearVelocity> vel) {
-    return this.run(() -> getIO().set(vel.get()));
-  }
+    /**
+     * Gets a command to run the mechanism at a velocity from a supplier
+     *
+     * @param vel velocity supplier
+     * @return command to run the mechanism at a velocity from a supplier
+     */
+    public Command setVelCmd(Supplier<LinearVelocity> vel) {
+        return this.run(() -> getIO().set(vel.get()));
+    }
 
-  /**
-   * Gets a command to move to a preset position
-   *
-   * @param name name of a preset position
-   * @return command to move to a preset position
-   */
-  public Command presetPosCmd(String name) {
-    return this.run(() -> getIO().gotoPresetPos(name));
-  }
+    /**
+     * Gets a command to move to a preset position
+     *
+     * @param name name of a preset position
+     * @return command to move to a preset position
+     */
+    public Command presetPosCmd(String name) {
+        return this.run(() -> getIO().gotoPresetPos(name));
+    }
 
-  /**
-   * Gets a command to move to a preset velocity
-   *
-   * @param name name of a preset velocity
-   * @return command to move to a preset velocity
-   */
-  public Command presetVelCmd(String name) {
-    return this.run(() -> getIO().gotoPresetVel(name));
-  }
+    /**
+     * Gets a command to move to a preset velocity
+     *
+     * @param name name of a preset velocity
+     * @return command to move to a preset velocity
+     */
+    public Command presetVelCmd(String name) {
+        return this.run(() -> getIO().gotoPresetVel(name));
+    }
 
-  /**
-   * Gets a SysID command
-   *
-   * @param maxVoltage maximum voltage for sysID routine
-   * @param step voltage step size
-   * @param duration maximum duration of the sysID routine
-   * @return command sequence to run sysID on the mechanism
-   */
-  public Command getSysIDCmd(Voltage maxVoltage, Velocity<VoltageUnit> step, Time duration) {
-    return getIO().getSysIDCmd(maxVoltage, step, duration);
-  }
+    /**
+     * Gets a SysID command
+     *
+     * @param maxVoltage maximum voltage for sysID routine
+     * @param step       voltage step size
+     * @param duration   maximum duration of the sysID routine
+     * @return command sequence to run sysID on the mechanism
+     */
+    public Command getSysIDCmd(Voltage maxVoltage, Velocity<VoltageUnit> step, Time duration) {
+        return getIO().getSysIDCmd(maxVoltage, step, duration);
+    }
 }
