@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.subsystems.common.IntakeMechanismIO;
+import frc.robot.subsystems.common.RollerMechanismIO;
 import frc.robot.subsystems.common.LinearMechanism;
 import frc.robot.subsystems.common.LinearMotorIO;
 import frc.robot.util.PIDConfig;
@@ -74,7 +74,7 @@ public class CoralRoller extends LinearMechanism {
     /** Constructor */
     public CoralRoller() {
         if (Constants.currentMode != Mode.REPLAY) {
-            io = new IntakeMechanismIO(motor);
+            io = new RollerMechanismIO(motor);
         } else {
             io = new LinearMotorIO();
         }

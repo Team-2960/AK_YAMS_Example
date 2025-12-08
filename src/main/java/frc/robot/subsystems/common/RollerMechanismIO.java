@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import yams.motorcontrollers.SmartMotorController;
 
-public class IntakeMechanismIO extends LinearMotorIO {
+public class RollerMechanismIO extends LinearMotorIO {
     /** Motor instance */
     private final SmartMotorController motor;
 
@@ -16,7 +16,7 @@ public class IntakeMechanismIO extends LinearMotorIO {
      *
      * @param elevator elevator instance
      */
-    public IntakeMechanismIO(SmartMotorController motor) {
+    public RollerMechanismIO(SmartMotorController motor) {
         this.motor = motor;
     }
 
